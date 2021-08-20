@@ -1,46 +1,69 @@
-import object as obj
-from object import *
 from itertools import combinations
 import time
 
+# ================================================
 
-def InputData():
-    f = open("input.txt", "r")
+
+xCfg = [0, -1, -1, -1, 0, 1, 1, 1, 0]
+yCfg = [0, -1, 0, 1, 1, 1, 0, -1, -1]
+
+
+# ================================================
+
+
+def InputData(fileAddr):
+    global info, color, constraint, start, found
+    info = list(list())
+    color = list(list())
+    constraint = list()
+    start = time.time()
+    found = 0
+
+    f = open(fileAddr, "r")
 
     for line in f:
         info.append(line.split())
 
     for i in range(len(info)):
         color.append(list())
+
         for j in range(len(info[i])):
             info[i][j] = int(info[i][j])
-            if (info[i][j]):
+
+            if info[i][j] != -1:
                 constraint.append((i, j))
+
             color[i].append(0)
+
     f.close()
+
+# ================================================
 
 
 def visualized():
     for row in info:
         for item in row:
-            if item == 0:
+            if item == -1:
                 print(" . ", end="")
             else:
                 print("", item, "", end="")
         print()
 
-    if not obj.found:
-        print("NO SOLUTION")
-        return 
-
     for i in range(len(info[0])):
         print("===", end="")
+
+    if not found:
+        print("NO SOLUTION")
+        return
+
     print(" 0 - Red / 1 - Blue")
 
     for row in color:
         for item in row:
             print("", item, "", end="")
         print()
+
+# ================================================
 
 
 def SAT():
@@ -49,23 +72,30 @@ def SAT():
         for loop in range(9):
             X = each[0] + xCfg[loop]
             Y = each[1] + yCfg[loop]
+
             if (X not in range(len(info))) or (Y not in range(len(info[0]))):
                 continue
+
             temp += color[X][Y]
+
         if temp != info[each[0]][each[1]]:
             return 0
 
     return 1
 
+# ================================================
+
 
 def Coloring(id):
-    if (time.time() - start) > 600: 
+    global found, start
+    
+    if (time.time() - start) > 600:
         print("NO SOLUTION")
         exit(0)
 
     if (id == len(constraint)):
         if SAT():
-            obj.found = 1
+            found = 1
         return
 
     perm = combinations([0, 1, 2, 3, 4, 5, 6, 7, 8],
@@ -78,6 +108,7 @@ def Coloring(id):
         for i in range(9):
             nextX = constraint[id][0] + xCfg[i]
             nextY = constraint[id][1] + yCfg[i]
+
             if (nextX not in range(len(info))) or (nextY not in range(len(info[0]))):
                 continue
 
@@ -94,7 +125,7 @@ def Coloring(id):
             continue
 
         Coloring(id+1)
-        if obj.found:
+        if found:
             return
 
         for i in changed:

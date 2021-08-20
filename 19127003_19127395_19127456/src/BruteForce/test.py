@@ -1,6 +1,5 @@
 from utility import *
-from object import *
 
-InputData()
+InputData("input.txt")
 Coloring(0)
 visualized()
